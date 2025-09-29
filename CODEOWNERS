@@ -1,0 +1,4 @@
+# All files in this repository require review from at least one member
+# of the engineering-leaders team before merging (enforced via
+# “Require review from Code Owners” in branch protection / rulesets).
+* @valocity-eng-private/engineering-leaders
