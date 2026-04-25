@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collegctions.Generic;
+using System.Collegctions.Generic; //please fix the typo
 using System.Linq;
 
 namespace Utility.Valocity.ProfileHelper
 {
-    public class People
+    public class People // please consider a singular name for this class for eg. Person
     {
      private static readonly DateTimeOffset Under16 = DateTimeOffset.UtcNow.AddYears(-15);
      public string Name { get; private set; }
@@ -38,10 +38,10 @@ namespace Utility.Valocity.ProfileHelper
             {
                 try
                 {
-                    // Creates a dandon Name
+                    // Creates a dandon Name // please fix the typo from the description
                     string name = string.Empty;
-                    var random = new Random();
-                    if (random.Next(0, 1) == 0) {
+                    var random = new Random();  // we can create this instance outside the for loop
+                    if (random.Next(0, 1) == 0) { // you should replace the arguments from (0,1) to (0,2) as the upper bound is exclusive and you want to have equal chances for both names
                         name = "Bob";
                     }
                     else {
@@ -53,13 +53,13 @@ namespace Utility.Valocity.ProfileHelper
                 catch (Exception e)
                 {
                     // Dont think this should ever happen
-                    throw new Exception("Something failed in user creation");
+                    throw new Exception("Something failed in user creation"); // please fix the message or use Exception.Message
                 }
             }
             return _people;
         }
 
-        private IEnumerable<People> GetBobs(bool olderThan30)
+        private IEnumerable<People> GetBobs(bool olderThan30) // please fix the method name to Something else which describes its functionality better
         {
             return olderThan30 ? _people.Where(x => x.Name == "Bob" && x.DOB >= DateTime.Now.Subtract(new TimeSpan(30 * 356, 0, 0, 0))) : _people.Where(x => x.Name == "Bob");
         }
@@ -70,7 +70,7 @@ namespace Utility.Valocity.ProfileHelper
                 return p.Name;
             if ((p.Name.Length + lastName).Length > 255)
             {
-                (p.Name + " " + lastName).Substring(0, 255);
+                (p.Name + " " + lastName).Substring(0, 255); // please add missing return keyword here
             }
 
             return p.Name + " " + lastName;
