@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11723.231 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GildedRose.Tests", "src\GildedRose.Tests\GildedRose.Tests.csproj", "{CD4715A2-532E-4C74-BC40-36EE64F61FCA}"
 EndProject
@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{21A00A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E9B2B641-EF32-484B-8255-AA7AE68231D5}"
 	ProjectSection(SolutionItems) = preProject
+		GildedRose.cs = GildedRose.cs
+		Item.cs = Item.cs
 		MIT-LICENSE.txt = MIT-LICENSE.txt
 		README.md = README.md
 	EndProjectSection
@@ -25,6 +27,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{B8B88B
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GildedRose.Console", "src\GildedRose.Console\GildedRose.Console.csproj", "{F2E879A9-7F1C-4C34-AB0D-2662F9815046}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Updaters", "Updaters", "{C0A8EFAC-4695-437A-90E9-A47F3F913F1F}"
+	ProjectSection(SolutionItems) = preProject
+		AgedBrieUpdater.cs = AgedBrieUpdater.cs
+		BackstagePassUpdater.cs = BackstagePassUpdater.cs
+		ConjuredItemUpdater.cs = ConjuredItemUpdater.cs
+		IItemUpdater.cs = IItemUpdater.cs
+		NormalItemUpdater.cs = NormalItemUpdater.cs
+		SulfurasUpdater.cs = SulfurasUpdater.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,5 +55,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0056C49B-CA78-4C14-BFE2-70694F40E56B}
 	EndGlobalSection
 EndGlobal

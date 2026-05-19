@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GildedRose;
 
 namespace GildedRose.Console;
 
@@ -111,11 +112,4 @@ public class Program
     }
 }
 
-public class Item
-{
-    public string Name { get; set; } = "";
-
-    public int SellIn { get; set; }
-
-    public int Quality { get; set; }
-}
+// Use Item from GildedRose.Item (defined in Item.cs)

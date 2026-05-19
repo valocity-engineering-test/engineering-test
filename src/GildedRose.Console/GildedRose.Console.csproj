@@ -9,4 +9,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- Include specific shared source files from repository root so console project compiles against the same domain model and updaters -->
+  <ItemGroup>
+    <Compile Include="..\..\Item.cs" />
+    <Compile Include="..\..\GildedRose.cs" />
+    <Compile Include="..\..\IItemUpdater.cs" />
+    <Compile Include="..\..\NormalItemUpdater.cs" />
+    <Compile Include="..\..\AgedBrieUpdater.cs" />
+    <Compile Include="..\..\BackstagePassUpdater.cs" />
+    <Compile Include="..\..\SulfurasUpdater.cs" />
+    <Compile Include="..\..\ConjuredItemUpdater.cs" />
+  </ItemGroup>
+
 </Project>
