@@ -4,15 +4,15 @@ namespace GildedRose.Console;
 
 public class Program
 {
-    public IList<Item> Items = new List<Item>();
+    private IList<Item> Items = new List<Item>();
 
     static void Main(string[] args)
     {
         System.Console.WriteLine("OMGHAI!");
 
         var app = new Program()
-                      {
-                          Items = new List<Item>
+        {
+            Items = new List<Item>
                                       {
                                           new Item {Name = "+5 Dexterity Vest", SellIn = 10, Quality = 20},
                                           new Item {Name = "Aged Brie", SellIn = 2, Quality = 0},
@@ -27,85 +27,151 @@ public class Program
                                           new Item {Name = "Conjured Mana Cake", SellIn = 3, Quality = 6}
                                       }
 
-                      };
+        };
 
-        app.UpdateQuality();
+        var factory = new ItemUpdaterFactory();
+
+        var inventoryManager = new InventoryManager(factory);
+
+        inventoryManager.UpdateQuality(app.Items);
 
         System.Console.ReadKey();
     }
 
-    public void UpdateQuality()
+    public interface IItemUpdater
     {
-        for (var i = 0; i < Items.Count; i++)
+        void Update(Item item);
+    }
+
+    public abstract class BaseItemUpdater : IItemUpdater
+    {
+        public abstract void Update(Item item);
+
+        protected void IncreaseQuality(Item item, int amount = 1)
         {
-            if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
+            item.Quality = Math.Min(50, item.Quality + amount);
+        }
+
+        protected void DecreaseQuality(Item item, int amount = 1)
+        {
+            item.Quality = Math.Max(0, item.Quality - amount);
+        }
+
+        protected void DecreaseSellIn(Item item)
+        {
+            item.SellIn--;
+        }
+    }
+    public class NormalItemUpdater : BaseItemUpdater
+    {
+        public override void Update(Item item)
+        {
+            DecreaseSellIn(item);
+
+            int degrade = item.SellIn < 0 ? 2 : 1;
+
+            DecreaseQuality(item, degrade);
+
+        }
+    }
+
+    public class AgedBrieUpdater : BaseItemUpdater
+    {
+        public override void Update(Item item)
+        {
+            DecreaseSellIn(item);
+
+            int increase = item.SellIn < 0 ? 2 : 1;
+
+            IncreaseQuality(item, increase);
+        }
+    }
+
+    public class BackstagePassUpdater : BaseItemUpdater
+    {
+        public override void Update(Item item)
+        {
+            DecreaseSellIn(item);
+
+            if (item.SellIn < 0)
             {
-                if (Items[i].Quality > 0)
-                {
-                    if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                    {
-                        Items[i].Quality = Items[i].Quality - 1;
-                    }
-                }
+                item.Quality = 0;
+                return;
             }
-            else
+
+            IncreaseQuality(item);
+
+            if (item.SellIn < 10)
             {
-                if (Items[i].Quality < 50)
-                {
-                    Items[i].Quality = Items[i].Quality + 1;
-
-                    if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
-                    {
-                        if (Items[i].SellIn < 11)
-                        {
-                            if (Items[i].Quality < 50)
-                            {
-                                Items[i].Quality = Items[i].Quality + 1;
-                            }
-                        }
-
-                        if (Items[i].SellIn < 6)
-                        {
-                            if (Items[i].Quality < 50)
-                            {
-                                Items[i].Quality = Items[i].Quality + 1;
-                            }
-                        }
-                    }
-                }
+                IncreaseQuality(item);
             }
 
-            if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
+            if (item.SellIn < 5)
             {
-                Items[i].SellIn = Items[i].SellIn - 1;
+                IncreaseQuality(item);
             }
+        }
+    }
 
-            if (Items[i].SellIn < 0)
+    public class SulfurasUpdater : BaseItemUpdater
+    {
+        public override void Update(Item item)
+        {
+            // Legendary item does not change
+        }
+    }
+
+    public class ConjuredItemUpdater : BaseItemUpdater
+    {
+        public override void Update(Item item)
+        {
+            DecreaseSellIn(item);
+
+            int degrade = item.SellIn < 0 ? 4 : 2;
+
+            DecreaseQuality(item, degrade);
+        }
+    }
+
+    public class ItemUpdaterFactory
+    {
+        private readonly Dictionary<string, IItemUpdater> _updaters;
+
+        public ItemUpdaterFactory()
+        {
+            _updaters = new Dictionary<string, IItemUpdater>
             {
-                if (Items[i].Name != "Aged Brie")
-                {
-                    if (Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                    {
-                        if (Items[i].Quality > 0)
-                        {
-                            if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                            {
-                                Items[i].Quality = Items[i].Quality - 1;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Items[i].Quality = Items[i].Quality - Items[i].Quality;
-                    }
-                }
-                else
-                {
-                    if (Items[i].Quality < 50)
-                    {
-                        Items[i].Quality = Items[i].Quality + 1;
-                    }
-                }
+                { "Aged Brie", new AgedBrieUpdater() },
+                { "Backstage passes to a TAFKAL80ETC concert", new BackstagePassUpdater() },
+                { "Sulfuras, Hand of Ragnaros", new SulfurasUpdater() },
+                { "Conjured Mana Cake", new ConjuredItemUpdater() }
+            };
+        }
+
+        public IItemUpdater GetUpdater(Item item)
+        {
+            return _updaters.ContainsKey(item.Name)
+                ? _updaters[item.Name]
+                : new NormalItemUpdater();
+        }
+    }
+
+    public class InventoryManager
+    {
+        private readonly ItemUpdaterFactory _factory;
+
+        public InventoryManager(ItemUpdaterFactory factory)
+        {
+            _factory = factory;
+        }
+
+        public void UpdateQuality(IList<Item> items)
+        {
+            foreach (var item in items)
+            {
+                var updater = _factory.GetUpdater(item);
+
+                updater.Update(item);
             }
         }
     }
