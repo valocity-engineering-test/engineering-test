@@ -44,7 +44,15 @@ public class Program
                 {
                     if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
                     {
-                        Items[i].Quality = Items[i].Quality - 1;
+                        // Conjured items degrade twice as fast as normal items
+                        if (Items[i].Name == "Conjured Mana Cake")
+                        {
+                            Items[i].Quality = Items[i].Quality - 2;
+                        }
+                        else
+                        {
+                            Items[i].Quality = Items[i].Quality - 1;
+                        }
                     }
                 }
             }
@@ -90,7 +98,15 @@ public class Program
                         {
                             if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
                             {
-                                Items[i].Quality = Items[i].Quality - 1;
+                                // Conjured items degrade twice as fast as normal items after expiry
+                                if (Items[i].Name == "Conjured Mana Cake")
+                                {
+                                    Items[i].Quality = Items[i].Quality - 2;
+                                }
+                                else
+                                {
+                                    Items[i].Quality = Items[i].Quality - 1;
+                                }
                             }
                         }
                     }
