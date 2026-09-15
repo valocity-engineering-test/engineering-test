@@ -4,6 +4,11 @@ namespace GildedRose.Console;
 
 public class Program
 {
+    private const string AgedBrie = "Aged Brie";
+    private const string BackstagePass = "Backstage passes to a TAFKAL80ETC concert";
+    private const string Sulfuras = "Sulfuras, Hand of Ragnaros";
+    private const int MaximumQuality = 50;
+
     public IList<Item> Items = new List<Item>();
 
     static void Main(string[] args)
@@ -36,78 +41,56 @@ public class Program
 
     public void UpdateQuality()
     {
-        for (var i = 0; i < Items.Count; i++)
+        foreach (var item in Items)
         {
-            if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
+            if (item.Name == Sulfuras)
             {
-                if (Items[i].Quality > 0)
-                {
-                    if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                    {
-                        Items[i].Quality = Items[i].Quality - 1;
-                    }
-                }
-            }
-            else
-            {
-                if (Items[i].Quality < 50)
-                {
-                    Items[i].Quality = Items[i].Quality + 1;
-
-                    if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
-                    {
-                        if (Items[i].SellIn < 11)
-                        {
-                            if (Items[i].Quality < 50)
-                            {
-                                Items[i].Quality = Items[i].Quality + 1;
-                            }
-                        }
-
-                        if (Items[i].SellIn < 6)
-                        {
-                            if (Items[i].Quality < 50)
-                            {
-                                Items[i].Quality = Items[i].Quality + 1;
-                            }
-                        }
-                    }
-                }
+                //"Sulfuras", being a legendary item, never has to be sold or decreases in Quality
+                continue;
             }
 
-            if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-            {
-                Items[i].SellIn = Items[i].SellIn - 1;
-            }
-
-            if (Items[i].SellIn < 0)
-            {
-                if (Items[i].Name != "Aged Brie")
-                {
-                    if (Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                    {
-                        if (Items[i].Quality > 0)
-                        {
-                            if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                            {
-                                Items[i].Quality = Items[i].Quality - 1;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Items[i].Quality = Items[i].Quality - Items[i].Quality;
-                    }
-                }
-                else
-                {
-                    if (Items[i].Quality < 50)
-                    {
-                        Items[i].Quality = Items[i].Quality + 1;
-                    }
-                }
-            }
+            UpdateItemQuality(item);
+            item.SellIn--;
         }
+    }
+
+    private static void UpdateItemQuality(Item item)
+    {
+        if (item.Name == AgedBrie)
+        {
+            //"Aged Brie" actually increases in Quality the older it gets
+            IncreaseQuality(item, item.SellIn <= 0 ? 2 : 1);
+            return;
+        }
+
+        if (item.Name == BackstagePass)
+        {
+            if (item.SellIn <= 0)
+            {
+                item.Quality = 0;
+                return;
+            }
+            //"Backstage passes", like aged brie, increases in Quality as its SellIn value approaches:
+            //Quality increases by 2 when there are 10 days or less
+            //Quality increases by 3 when there are 5 days or less
+            //Quality drops to 0 after the concert
+            var increase = item.SellIn <= 5 ? 3 : item.SellIn <= 10 ? 2 : 1;
+            IncreaseQuality(item, increase);
+            return;
+        }
+        //"Conjured" items degrade in Quality twice as fast as normal items
+        var degradation = item.Name.StartsWith("Conjured", StringComparison.Ordinal) ? 2 : 1;
+        DecreaseQuality(item, item.SellIn <= 0 ? degradation * 2 : degradation);
+    }
+
+    private static void IncreaseQuality(Item item, int amount)
+    {
+        item.Quality = Math.Min(MaximumQuality, item.Quality + amount);
+    }
+
+    private static void DecreaseQuality(Item item, int amount)
+    {
+        item.Quality = Math.Max(0, item.Quality - amount);
     }
 }
 
