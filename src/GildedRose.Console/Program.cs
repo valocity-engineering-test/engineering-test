@@ -36,78 +36,83 @@ public class Program
 
     public void UpdateQuality()
     {
-        for (var i = 0; i < Items.Count; i++)
+        foreach (var item in Items)
         {
-            if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-            {
-                if (Items[i].Quality > 0)
-                {
-                    if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                    {
-                        Items[i].Quality = Items[i].Quality - 1;
-                    }
-                }
-            }
-            else
-            {
-                if (Items[i].Quality < 50)
-                {
-                    Items[i].Quality = Items[i].Quality + 1;
-
-                    if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
-                    {
-                        if (Items[i].SellIn < 11)
-                        {
-                            if (Items[i].Quality < 50)
-                            {
-                                Items[i].Quality = Items[i].Quality + 1;
-                            }
-                        }
-
-                        if (Items[i].SellIn < 6)
-                        {
-                            if (Items[i].Quality < 50)
-                            {
-                                Items[i].Quality = Items[i].Quality + 1;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-            {
-                Items[i].SellIn = Items[i].SellIn - 1;
-            }
-
-            if (Items[i].SellIn < 0)
-            {
-                if (Items[i].Name != "Aged Brie")
-                {
-                    if (Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                    {
-                        if (Items[i].Quality > 0)
-                        {
-                            if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                            {
-                                Items[i].Quality = Items[i].Quality - 1;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Items[i].Quality = Items[i].Quality - Items[i].Quality;
-                    }
-                }
-                else
-                {
-                    if (Items[i].Quality < 50)
-                    {
-                        Items[i].Quality = Items[i].Quality + 1;
-                    }
-                }
-            }
+            UpdateItem(item);
         }
+    }
+
+    private static void UpdateItem(Item item)
+    {
+        if (item.Name == "Sulfuras, Hand of Ragnaros")
+        {
+            return;
+        }
+
+        item.SellIn--;
+
+        if (item.Name == "Aged Brie")
+        {
+            item.Quality = UpdateIncreasingQuality(item.Quality, 1, item.SellIn < 0 ? 2 : 0);
+            return;
+        }
+
+        if (item.Name == "Backstage passes to a TAFKAL80ETC concert")
+        {
+            if (item.SellIn < 0)
+            {
+                item.Quality = 0;
+                return;
+            }
+
+            var qualityIncrease = 1;
+            if (item.SellIn < 10)
+            {
+                qualityIncrease++;
+            }
+
+            if (item.SellIn < 5)
+            {
+                qualityIncrease++;
+            }
+
+            item.Quality = UpdateIncreasingQuality(item.Quality, qualityIncrease, 0);
+            return;
+        }
+
+        var drain = IsConjured(item) ? 2 : 1;
+        if (item.SellIn < 0)
+        {
+            drain *= 2;
+        }
+
+        item.Quality = ClampQuality(item.Quality - drain);
+    }
+
+    private static int UpdateIncreasingQuality(int currentQuality, int baseIncrease, int expiredIncrease)
+    {
+        var totalIncrease = baseIncrease + expiredIncrease;
+        return ClampQuality(currentQuality + totalIncrease);
+    }
+
+    private static bool IsConjured(Item item)
+    {
+        return item.Name.StartsWith("Conjured", System.StringComparison.Ordinal);
+    }
+
+    private static int ClampQuality(int quality)
+    {
+        if (quality < 0)
+        {
+            return 0;
+        }
+
+        if (quality > 50)
+        {
+            return 50;
+        }
+
+        return quality;
     }
 }
 
