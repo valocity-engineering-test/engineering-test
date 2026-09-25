@@ -161,23 +161,4 @@ public class UpdateQualityCharacterisationTests
         Assert.Equal(-1, afterConcert.SellIn);
         Assert.Equal(0, afterConcert.Quality);
     }
-
-    // ---------------------------------------------------------------
-    // Conjured items
-    // ---------------------------------------------------------------
-
-    /// <summary>
-    /// LEGACY BEHAVIOUR, PINNED DELIBERATELY. The inventory already contains a conjured
-    /// item but the system has no concept of one, so it degrades like an ordinary item.
-    /// This is the behaviour the new feature is required to change; the test is replaced
-    /// in the commit that introduces conjured item support.
-    /// </summary>
-    [Fact]
-    public void Legacy_ConjuredItem_IsCurrentlyTreatedAsAnOrdinaryItem()
-    {
-        var item = InventoryFixture.AfterOneDay(ItemNames.Conjured, sellIn: 3, quality: 6);
-
-        Assert.Equal(2, item.SellIn);
-        Assert.Equal(5, item.Quality);
-    }
 }

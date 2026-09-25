@@ -14,7 +14,15 @@ public sealed class ItemUpdaterResolver
     public const string Sulfuras = "Sulfuras, Hand of Ragnaros";
     public const string BackstagePass = "Backstage passes to a TAFKAL80ETC concert";
 
+    /// <summary>
+    /// Conjured goods are a category rather than a single product, so they are matched on
+    /// the prefix. The trailing space keeps "Conjured Mana Cake" in and leaves names that
+    /// merely share the stem, such as "Conjuration Robes", out.
+    /// </summary>
+    public const string ConjuredPrefix = "Conjured ";
+
     private static readonly IItemUpdater Default = new DefaultItemUpdater();
+    private static readonly IItemUpdater Conjured = new ConjuredItemUpdater();
 
     private static readonly IReadOnlyDictionary<string, IItemUpdater> ByName =
         new Dictionary<string, IItemUpdater>(StringComparer.Ordinal)
@@ -25,5 +33,14 @@ public sealed class ItemUpdaterResolver
         };
 
     public IItemUpdater Resolve(Item item)
-        => ByName.TryGetValue(item.Name, out var updater) ? updater : Default;
+    {
+        if (ByName.TryGetValue(item.Name, out var updater))
+        {
+            return updater;
+        }
+
+        return item.Name.StartsWith(ConjuredPrefix, StringComparison.Ordinal)
+            ? Conjured
+            : Default;
+    }
 }
