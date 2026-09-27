@@ -6,6 +6,9 @@ public class Program
 {
     public IList<Item> Items = new List<Item>();
 
+    private const int MaxQuality = 50;
+    private const int MinQuality = 0;
+
     static void Main(string[] args)
     {
         System.Console.WriteLine("OMGHAI!");
@@ -21,10 +24,13 @@ public class Program
                                           new Item
                                               {
                                                   Name = "Backstage passes to a TAFKAL80ETC concert",
-                                                  SellIn = 15,
+                                                  SellIn = 5,
                                                   Quality = 20
                                               },
-                                          new Item {Name = "Conjured Mana Cake", SellIn = 3, Quality = 6}
+                                          new Item {Name = "Conjured Mana Cake", SellIn = 3, Quality = 6},
+                                          new Item {Name = "Conjured Items1", SellIn = 5, Quality = 10},
+                                          new Item {Name = "Conjured Items2", SellIn = 0, Quality = 8},
+                                          new Item {Name = "Conjured Items3", SellIn = 3, Quality = 1}
                                       }
 
                       };
@@ -34,80 +40,88 @@ public class Program
         System.Console.ReadKey();
     }
 
+
     public void UpdateQuality()
     {
-        for (var i = 0; i < Items.Count; i++)
+        foreach(var item in Items)
         {
-            if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
+            if(item.Name.Equals("Sulfuras, Hand of Ragnaros", StringComparison.Ordinal))
             {
-                if (Items[i].Quality > 0)
-                {
-                    if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                    {
-                        Items[i].Quality = Items[i].Quality - 1;
-                    }
-                }
+                continue;
+            }
+
+            if(item.Name.Equals("Backstage passes to a TAFKAL80ETC concert", StringComparison.Ordinal))
+            {
+                UpdateBackstage(item);
+            }
+            else if(item.Name.Equals("Aged Brie", StringComparison.Ordinal))
+            {
+                UpdateAgeBrie(item);
             }
             else
             {
-                if (Items[i].Quality < 50)
-                {
-                    Items[i].Quality = Items[i].Quality + 1;
-
-                    if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
-                    {
-                        if (Items[i].SellIn < 11)
-                        {
-                            if (Items[i].Quality < 50)
-                            {
-                                Items[i].Quality = Items[i].Quality + 1;
-                            }
-                        }
-
-                        if (Items[i].SellIn < 6)
-                        {
-                            if (Items[i].Quality < 50)
-                            {
-                                Items[i].Quality = Items[i].Quality + 1;
-                            }
-                        }
-                    }
-                }
+                UpdateNormalItems(item);
             }
 
-            if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
+            item.SellIn--;
+
+            if(item.SellIn < 0)
             {
-                Items[i].SellIn = Items[i].SellIn - 1;
+                UpdateAfterSellInPassed(item);
             }
-
-            if (Items[i].SellIn < 0)
-            {
-                if (Items[i].Name != "Aged Brie")
-                {
-                    if (Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                    {
-                        if (Items[i].Quality > 0)
-                        {
-                            if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                            {
-                                Items[i].Quality = Items[i].Quality - 1;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Items[i].Quality = Items[i].Quality - Items[i].Quality;
-                    }
-                }
-                else
-                {
-                    if (Items[i].Quality < 50)
-                    {
-                        Items[i].Quality = Items[i].Quality + 1;
-                    }
-                }
-            }
+         
+            //chekcing output
+            System.Console.WriteLine($"Item Name: {item.Name}, Sellin: {item.SellIn}, Quality: {item.Quality}");
         }
+        
+    }
+    private void UpdateBackstage(Item item)
+    {
+        IncreaseQuality(item);
+        if (item.SellIn <= 10)
+        {
+            IncreaseQuality(item);
+        }
+        if (item.SellIn <= 5)
+        {
+            IncreaseQuality(item);
+        }
+    }
+    private static void UpdateAgeBrie(Item item)
+    {
+        IncreaseQuality(item);
+    }
+    private static void UpdateNormalItems(Item item)
+    {
+        DecreaseQuality(item);
+    }
+    private static void UpdateAfterSellInPassed(Item item)
+    {
+        if (item.Name.Equals("Backstage passes to a TAFKAL80ETC concert", StringComparison.Ordinal))
+        {
+            item.Quality = MinQuality;
+        }
+        if (item.Name.Equals("Aged Brie", StringComparison.Ordinal))
+        {
+            IncreaseQuality(item);
+        }
+        DecreaseQuality(item);
+    }
+    private static void IncreaseQuality(Item item)
+    {
+        item.Quality = item.Quality + 1 > MaxQuality ? MaxQuality : item.Quality + 1;
+    }
+    private static void DecreaseQuality(Item item)
+    {
+        if (item.Name.StartsWith("Conjured", StringComparison.Ordinal))
+        {
+            item.Quality = item.Quality - 2 < MinQuality ? MinQuality : item.Quality - 2;
+        }
+        else
+        {
+            item.Quality = item.Quality - 1 < MinQuality ? MinQuality : item.Quality - 1;
+        }
+            
     }
 }
 
